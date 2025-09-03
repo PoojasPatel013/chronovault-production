@@ -9,3 +9,4 @@ backend/package-lock.json
 node_modules
 frontend/.env.development
 frontend/.env.production
+.vercel
