@@ -30,6 +30,10 @@ app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true,
 }));
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  next();
+});
 
 // Parse JSON bodies
 app.use(express.json());
