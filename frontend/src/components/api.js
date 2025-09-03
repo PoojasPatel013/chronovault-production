@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 
 // Create axios instance with default configuration
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',  // Added /api to baseURL
+  baseURL: 'https://chronovault-production.onrender.com/api',  // Added /api to baseURL
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',

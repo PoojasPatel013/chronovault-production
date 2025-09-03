@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 
 // Update the API configuration in AuthContext.jsx
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: 'https://chronovault-production.onrender.com/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
