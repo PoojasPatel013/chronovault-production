@@ -137,5 +137,6 @@ function App() {
     </Provider>
   );
 }
+console.log("API URL:", import.meta.env.NEXT_PUBLIC_API_URL);
 
 export default App;
