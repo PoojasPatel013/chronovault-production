@@ -43,7 +43,8 @@ const Settings = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`)
+      const apiBaseUrl = import.meta.env.VITE_API_URL
+      const response = await fetch(`${apiBaseUrl}/api/users/me`)
       const data = await response.json()
       setProfile(data)
       setFormData({
@@ -74,7 +75,8 @@ const Settings = () => {
     setSuccess("")
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/update`, {
+      const apiBaseUrl = import.meta.env.VITE_API_URL
+      const response = await fetch(`${apiBaseUrl}/api/users/update`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -124,7 +126,8 @@ const Settings = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/change-password`, {
+      const apiBaseUrl = import.meta.env.VITE_API_URL
+      const response = await fetch(`${apiBaseUrl}/api/auth/change-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -552,7 +555,7 @@ const Settings = () => {
                     <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-8">
                       <h3 className="text-xl font-bold text-red-400 mb-4">Danger Zone</h3>
                       <p className="text-gray-400 mb-6">
-                        Once you sign out, you'll need to sign in again to access your account.
+                        Once you sign out, you&#39;ll need to sign in again to access your account.
                       </p>
                       <button
                         onClick={handleLogout}
