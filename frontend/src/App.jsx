@@ -17,13 +17,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Settings from './components/Settings';
 import PrivateTimeCapsules from './components/PrivateTimeCapsules';
 import Profile from './components/Profile';
-import Upgrade from './components/Upgrade';
 import { AuthProvider } from './contexts/AuthContext';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import './index.css'
 import axios from 'axios';
-import { AccessProvider } from './contexts/AccessContext';
 
 axios.defaults.withCredentials = true;
 
@@ -31,7 +29,6 @@ function App() {
   return (
     <Provider store={store}>
       <AuthProvider>
-        <AccessProvider>
         <ThemeProvider>
           <div className="min-h-screen bg-background dark:bg-black relative">
             <Header />
@@ -120,19 +117,10 @@ function App() {
                   }
                 />
 
-              <Route
-                path="/upgrade"
-                element={
-                  <ProtectedRoute>
-                    <Upgrade />
-                  </ProtectedRoute>
-                }
-              />
             </Routes>
             </div>
           </div>
         </ThemeProvider>
-        </AccessProvider>
       </AuthProvider>
     </Provider>
   );

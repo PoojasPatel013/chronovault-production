@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { User, Lock, CreditCard, Edit, Eye, Clock, Shield, Brain, Quote, Star, Lightbulb, Heart } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
-import { useAccess } from "../contexts/AccessContext"
 import { Link } from "react-router-dom"
 import api from "../components/api"
 
@@ -14,8 +13,11 @@ const UserDashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [currentQuote, setCurrentQuote] = useState(0)
   const { user } = useAuth()
-  const { access, loading: accessLoading } = useAccess()
-
+  const [access, setAccess] = useState({
+  plan: "free",       // "free" | "basic" | "pro"
+  credits: 30,        // only relevant for free plan
+  dailyUsage: 120,    // minutes used today (for basic plan)
+})
   const inspirationalQuotes = [
     {
       text: "The greatest revolution of our generation is the discovery that human beings, by changing the inner attitudes of their minds, can change the outer aspects of their lives.",
@@ -104,21 +106,16 @@ const UserDashboard = () => {
     }
   }
 
-  if (!user || accessLoading || !userProfile) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-            <Brain className="w-10 h-10 text-white" />
-          </div>
-          <div className="space-y-2">
-            <div className="w-32 h-4 bg-gray-800 rounded animate-pulse mx-auto"></div>
-            <div className="w-24 h-3 bg-gray-900 rounded animate-pulse mx-auto"></div>
-          </div>
-        </div>
-      </div>
-    )
+  const upgradePlan = (newPlan) => {
+  if (newPlan === "basic") {
+    setAccess({ plan: "basic", credits: 0, dailyUsage: 0 })
+  } else if (newPlan === "pro") {
+    setAccess({ plan: "pro", credits: null, dailyUsage: null })
+  } else {
+    setAccess({ plan: "free", credits: 50, dailyUsage: 0 })
   }
+}
+
 
   const cardVariants = {
     hidden: { opacity: 0, y: 30, scale: 0.95 },
@@ -208,7 +205,7 @@ const UserDashboard = () => {
                 className="space-y-4"
               >
                 <blockquote className="text-xl md:text-2xl font-medium text-gray-200 italic leading-relaxed max-w-4xl mx-auto">
-                  "{inspirationalQuotes[currentQuote].text}"
+                  &quot;{inspirationalQuotes[currentQuote].text}&quot;
                 </blockquote>
                 <cite className="text-blue-400 font-semibold">— {inspirationalQuotes[currentQuote].author}</cite>
               </motion.div>
@@ -304,8 +301,8 @@ const UserDashboard = () => {
               <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Lightbulb className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Today's Affirmation</h3>
-              <p className="text-xl text-gray-200 font-medium italic">"{todaysAffirmation}"</p>
+              <h3 className="text-2xl font-bold text-white mb-4">Today&apos;s Affirmation</h3>
+              <p className="text-xl text-gray-200 font-medium italic">&quot;{todaysAffirmation}&quot;</p>
               <p className="text-sm text-gray-400 mt-4">Take a moment to reflect on this positive thought</p>
             </div>
           </motion.div>
@@ -376,72 +373,35 @@ const UserDashboard = () => {
                   </div>
                 </div>
 
-                {access && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="text-center">
-                      <div className="inline-flex items-center px-6 py-3 bg-blue-600/20 rounded-2xl border border-blue-500/30 mb-4">
-                        <Star className="w-5 h-5 text-blue-400 mr-2" />
-                        <span className="text-2xl font-bold text-blue-400 capitalize">{access.plan}</span>
-                      </div>
+                              
+              <div className="flex flex-col justify-center space-y-4">
+                {access.plan !== "pro" ? (
+                  <>
+                    <button
+                      onClick={() => upgradePlan("basic")}
+                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    >
+                      <Star className="w-5 h-5 mr-2" />
+                      Upgrade to Basic
+                    </button>
 
-                      {access.plan === "free" && (
-                        <div className="space-y-3">
-                          <p className="text-blue-400 font-semibold text-lg">{access.credits} credits remaining</p>
-                          <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden">
-                            <div
-                              className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-500"
-                              style={{ width: `${(access.credits / 50) * 100}%` }}
-                            />
-                          </div>
-                          <p className="text-xs text-gray-400">Daily usage limit</p>
-                        </div>
-                      )}
-
-                      {access.plan === "basic" && (
-                        <div className="space-y-3">
-                          <p className="text-blue-400 font-semibold text-lg">
-                            {access.dailyUsage} / 720 minutes used today
-                          </p>
-                          <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden">
-                            <div
-                              className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-500"
-                              style={{ width: `${(access.dailyUsage / 720) * 100}%` }}
-                            />
-                          </div>
-                          <p className="text-xs text-gray-400">Daily usage</p>
-                        </div>
-                      )}
-
-                      {access.plan === "pro" && (
-                        <div className="space-y-3">
-                          <p className="text-blue-400 font-semibold text-lg">Unlimited access</p>
-                          <div className="w-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full h-3" />
-                          <p className="text-xs text-gray-400">No limits</p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col justify-center">
-                      {access.plan !== "pro" && (
-                        <Link
-                          to="/upgrade"
-                          className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg"
-                        >
-                          <Star className="w-5 h-5 mr-2" />
-                          Upgrade Plan
-                        </Link>
-                      )}
-                      {access.plan === "pro" && (
-                        <div className="text-center p-4 bg-blue-500/20 rounded-2xl border border-blue-500/30">
-                          <Star className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-                          <p className="text-blue-400 font-semibold">Premium Member</p>
-                        </div>
-                      )}
-                    </div>
+                    <button
+                      onClick={() => upgradePlan("pro")}
+                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    >
+                      <Star className="w-5 h-5 mr-2" />
+                      Upgrade to Pro
+                    </button>
+                  </>
+                ) : (
+                  <div className="text-center p-4 bg-purple-500/20 rounded-2xl border border-purple-500/30">
+                    <Star className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                    <p className="text-purple-400 font-semibold">Premium Member (Pro)</p>
                   </div>
                 )}
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
           </div>
 
           {/* Privacy Settings */}
