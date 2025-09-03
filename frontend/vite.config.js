@@ -14,7 +14,7 @@ export default defineConfig({
       }
     },
     cors: {
-      origin: '*',
+      origin: 'https://chronovault-web-app-ochre.vercel.app',
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
