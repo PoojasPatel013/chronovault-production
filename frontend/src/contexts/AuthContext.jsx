@@ -62,8 +62,8 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const response = await api.get('/auth/me');
-        if (response.status === 200 && response.data.user) {
-          setUser(response.data.user);
+        if (response.status === 200 && response.data.success) {
+          setUser(response.data.data.user); // ✅ Corrected
           setIsAuthenticated(true);
         } else {
           throw new Error('Invalid response from server');
@@ -81,28 +81,24 @@ export const AuthProvider = ({ children }) => {
 
   // Authentication functions
   const signup = async (userData) => {
-    try {
-      const response = await api.post('/auth/register', userData);
-      const { token, user } = response.data;
-      
-      // Store token in cookie
-      Cookies.set('jwt', token, { 
-        expires: 7,
-        secure: false, // Allow local development
-        sameSite: 'lax'
-      });
-      
-      // Update user state with verified data
-      setUser(user);
-      setIsAuthenticated(true);
-      setError('');
-      return true;
-    } catch (error) {
-      console.error('Signup error:', error);
-      setError(error.response?.data?.message || error.message || 'Signup failed');
-      return false;
+  try {
+    const response = await api.post('/auth/register', userData);
+
+    if (!response.data.success) {
+      throw new Error(response.data.message || 'Signup failed');
     }
-  };
+
+    const { token, user } = response.data;
+    Cookies.set('jwt', token, { expires: 7, secure: false, sameSite: 'lax' });
+    setUser(user);
+    setIsAuthenticated(true);
+    setError('');
+    return true;
+  } catch (error) {
+    setError(error.response?.data?.message || error.message || 'Signup failed');
+    return false;
+  }
+};
 
   const login = async (credentials) => {
     try {
