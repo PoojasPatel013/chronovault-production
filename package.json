@@ -1,0 +1,16 @@
+{
+  "name": "chronovault-2bd38ec4745692f387df65b7a207e30b5daaa6e8",
+  "version": "1.0.0",
+  "description": "ChronoVault is a revolutionary time capsule and therapist application designed to provide a safe, private, and impactful space for users to engage in therapy sessions, meaningful conversations, and personal reflections. It offers AI-driven therapy, professional therapist consultations, and a private community where users can express themselves freely while maintaining anonymity and security.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "vercel": "^47.0.1"
+  }
+}

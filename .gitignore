@@ -1,0 +1,11 @@
+frontend/.env
+backend/.env
+
+frontend/node_modules
+backend/node_modules
+frontend/package-lock.json
+backend/package-lock.json
+.vercel
+node_modules
+frontend/.env.development
+frontend/.env.production

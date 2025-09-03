@@ -1,0 +1,4 @@
+export const GET_FEED_ITEMS = 'GET_FEED_ITEMS';
+export const LIKE_FEED_ITEM = 'LIKE_FEED_ITEM';
+export const ADD_COMMENT = 'ADD_COMMENT';
+export const COMMUNITY_ERROR = 'COMMUNITY_ERROR';
