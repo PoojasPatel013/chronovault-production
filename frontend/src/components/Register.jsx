@@ -13,7 +13,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const navigate = useNavigate()
-  const login = useAuth().login
+  const {signup} = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -21,36 +21,25 @@ const Register = () => {
     setLoading(true)
 
     try {
-      const response = await fetch("https://chronovault-production.onrender.com/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          gender,
-          birthdate: new Date(birthdate).toISOString(),
-        }),
-      })
+    const success = await signup({
+      name,
+      email,
+      password,
+      gender,
+      birthdate: new Date(birthdate).toISOString(),
+    });
 
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.message || "Registration failed")
-      }
-
-      const { user } = result
-      navigate("/login")
-    } catch (error) {
-      console.error("Registration error:", error)
-      setError(error.message || "An unexpected error occurred. Please try again.")
-    } finally {
-      setLoading(false)
+    if (success) {
+      navigate("/");
+    } else {
+      setError("Registration failed");
     }
+  } catch (err) {
+    setError(err.message || "An unexpected error occurred");
+  } finally {
+    setLoading(false);
+  }
+
 
     console.log("Submitting:", {
       name,
