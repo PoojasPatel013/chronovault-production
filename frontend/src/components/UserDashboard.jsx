@@ -81,7 +81,6 @@ const UserDashboard = () => {
           setUserProfile({
             name: profileData.user.name,
             email: profileData.user.email,
-            joinDate: profileData.user.createdAt || "2024-01-15",
             lastLogin: new Date().toISOString(),
             timeCapsules: capsuleData?.data?.length || 0,
           })
@@ -129,7 +128,6 @@ const UserDashboard = () => {
     return "Evening"
   }
 
-  const membershipDays = Math.floor((new Date() - new Date(userProfile.joinDate)) / (1000 * 60 * 60 * 24))
   const todaysAffirmation = dailyAffirmations[new Date().getDay()]
 
   return (
