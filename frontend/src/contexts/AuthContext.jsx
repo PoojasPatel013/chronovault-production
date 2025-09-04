@@ -1,38 +1,31 @@
 // frontend/src/contexts/AuthContext.jsx
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import Cookies from 'js-cookie';
-import api from '../components/api'; // ✅ reuse the shared axios client
+import React, { createContext, useState, useEffect, useContext } from "react";
+import api from "../components/api"; // axios instance (withCredentials: true)
 
+// Context
 export const AuthContext = createContext(null);
 
-// eslint-disable-next-line react/prop-types
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  // On mount, if we have a JWT (stored on FE domain), fetch /auth/me with Bearer header (api.js handles header)
+  // On mount → try to get user from cookie
   useEffect(() => {
     const init = async () => {
       try {
-        const token = Cookies.get('jwt');
-        if (!token) {
+        const res = await api.get("/auth/me", { withCredentials: true });
+        if (res.status === 200 && res.data?.success && res.data?.data?.user) {
+          setUser(res.data.data.user);
+          setIsAuthenticated(true);
+          setError("");
+        } else {
           setUser(null);
           setIsAuthenticated(false);
-          return;
-        }
-        const res = await api.get('/auth/me'); // will include Authorization from api.js
-        if (res.status === 200 && res.data?.success && res.data?.data?.user) {
-          setUser(res.data.data.user); // ✅ correct shape
-          setIsAuthenticated(true);
-          setError('');
-        } else {
-          throw new Error('Invalid response from server');
         }
       } catch (e) {
-        console.error('Auth init failed:', e);
-        Cookies.remove('jwt');
+        console.error("Auth init failed:", e);
         setUser(null);
         setIsAuthenticated(false);
       } finally {
@@ -45,18 +38,16 @@ export const AuthProvider = ({ children }) => {
   // Register
   const signup = async (userData) => {
     try {
-      const res = await api.post('/auth/register', userData, { withCredentials: true });
-      if (!res.data?.success) throw new Error(res.data?.message || 'Signup failed');
-
-      const { token, user } = res.data;
-      Cookies.set('jwt', token, { expires: 7, secure: false, sameSite: 'lax' }); // FE cookie so api.js can read it
-      setUser(user);
+      const res = await api.post("/auth/register", userData, { withCredentials: true });
+      if (!res.data?.success) throw new Error(res.data?.message || "Signup failed");
+      // Cookie is already set by backend
+      setUser(res.data.user);
       setIsAuthenticated(true);
-      setError('');
+      setError("");
       return true;
     } catch (e) {
-      console.error('Signup error:', e);
-      setError(e.response?.data?.message || e.message || 'Signup failed');
+      console.error("Signup error:", e);
+      setError(e.response?.data?.message || e.message || "Signup failed");
       return false;
     }
   };
@@ -64,53 +55,75 @@ export const AuthProvider = ({ children }) => {
   // Login
   const login = async (credentials) => {
     try {
-      const res = await api.post('/auth/login', credentials, { withCredentials: true });
-      if (!res.data?.success) throw new Error(res.data?.message || 'Login failed');
-
-      const { token, user } = res.data;
-      Cookies.set('jwt', token, { expires: 7, secure: false, sameSite: 'lax' }); // FE cookie for api.js
-      setUser(user);
+      const res = await api.post("/auth/login", credentials, { withCredentials: true });
+      if (!res.data?.success) throw new Error(res.data?.message || "Login failed");
+      // Cookie is already set by backend
+      setUser(res.data.user);
       setIsAuthenticated(true);
-      setError('');
-      return user;
+      setError("");
+      return res.data.user;
     } catch (e) {
-      console.error('Login error:', e);
-      setError(e.response?.data?.message || e.message || 'Login failed');
-      Cookies.remove('jwt');
+      console.error("Login error:", e);
+      setError(e.response?.data?.message || e.message || "Login failed");
+      setUser(null);
+      setIsAuthenticated(false);
       return null;
     }
   };
 
-  // Google path just reuses the same state/cookie approach
-  const loginWithGoogle = (userData, token) => {
-    Cookies.set('jwt', token, { expires: 7, secure: false, sameSite: 'lax' });
-    setUser(userData);
-    setIsAuthenticated(true);
-    setError('');
+  // Google OAuth login (cookie already set by backend)
+  const loginWithGoogle = async () => {
+    try {
+      const res = await api.get("/auth/me", { withCredentials: true });
+      if (res.status === 200 && res.data?.success && res.data?.data?.user) {
+        setUser(res.data.data.user);
+        setIsAuthenticated(true);
+        setError("");
+      } else {
+        throw new Error("Failed to fetch user after Google login");
+      }
+    } catch (e) {
+      console.error("Google login error:", e);
+      setUser(null);
+      setIsAuthenticated(false);
+      setError("Google login failed");
+    }
   };
 
-  // Logout (optional server call to clear its cookie if you use it)
+  // Logout
   const logout = async () => {
-    try { await api.post('/auth/logout'); } catch (_) {}
-    Cookies.remove('jwt');
+    try {
+      await api.post("/auth/logout", {}, { withCredentials: true });
+    } catch (_) {}
     setUser(null);
     setIsAuthenticated(false);
-    setError('');
+    setError("");
     return true;
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, signup, login, logout, loading, error, loginWithGoogle, setError }}
+      value={{
+        user,
+        isAuthenticated,
+        signup,
+        login,
+        loginWithGoogle,
+        logout,
+        loading,
+        error,
+        setError,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
 
+// Hook
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (ctx === null) throw new Error('useAuth must be used within an AuthProvider');
+  if (ctx === null) throw new Error("useAuth must be used within an AuthProvider");
   return ctx;
 };
 
