@@ -27,13 +27,18 @@ dotenv.config();
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: process.env.FRONTEND_URL, // "https://chronovault-web-app-ochre.vercel.app"
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
+
 
 // Parse JSON bodies
 app.use(express.json());
@@ -60,7 +65,7 @@ app.use('/api/therapy', verifyToken, therapyRouter);
 app.use('/api/therapists', verifyToken, therapistsRouter);
 app.use('/api/settings', verifyToken, settingsRouter);
 app.use('/api/personality', verifyToken, personalityRouter);
-app.use('/chat', verifyToken, chatRoutes);
+app.use('/api/chat', verifyToken, chatRoutes);
 app.use('/api/access', accessRoutes);
 
 

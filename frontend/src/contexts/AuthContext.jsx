@@ -15,8 +15,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
   const init = async () => {
     try {
-      const res = await api.get('/auth/me'); // cookie auto-sent
-      if (res.data?.success && res.data?.data?.user) {
+      const res = await api.get('/auth/me', { withCredentials: true });
+      if (res.data?.success) {
         setUser(res.data.data.user);
         setIsAuthenticated(true);
       } else {
@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
   };
   init();
 }, []);
+
 
   // Register
   const signup = async (userData) => {
