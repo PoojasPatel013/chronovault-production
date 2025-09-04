@@ -13,7 +13,7 @@ const Login = () => {
   const { loginWithGoogle } = useAuth();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black p-4">
+    <div className="min-h-screen flex items-center justify-center bg-black p-4 relative">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
@@ -21,10 +21,9 @@ const Login = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-5"></div>
       </div>
 
-      <div className="relative w-full max-w-md">
-        {/* Main login card */}
-        <div className="bg-white/5 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/10 p-8 space-y-6">
-          {/* Header */}
+      <div className="relative w-full max-w-5xl flex flex-col md:flex-row items-center bg-white/5 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
+        {/* Left side with login card */}
+        <div className="w-full md:w-1/2 p-8 space-y-6">
           <div className="text-center space-y-2">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mx-auto flex items-center justify-center mb-4">
               <svg
@@ -45,7 +44,6 @@ const Login = () => {
             <p className="text-gray-400">Sign in with your Google account</p>
           </div>
 
-          {/* Error message */}
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 flex items-center space-x-3 animate-in slide-in-from-top-2 duration-300">
               <svg
@@ -65,7 +63,6 @@ const Login = () => {
             </div>
           )}
 
-          {/* Google Login button */}
           <div className="flex justify-center">
             {loading ? (
               <div className="flex items-center justify-center space-x-2 text-white">
@@ -104,7 +101,7 @@ const Login = () => {
                     );
 
                     if (res.data.success) {
-                      await loginWithGoogle(); // hydrate from /auth/me
+                      await loginWithGoogle();
                       navigate("/", { replace: true });
                     } else {
                       setError(res.data.message || "Google login failed");
@@ -120,13 +117,21 @@ const Login = () => {
               />
             )}
           </div>
+
+          <div className="text-center mt-6">
+            <p className="text-gray-500 text-xs">
+              By signing in, you agree to our Terms of Service and Privacy Policy
+            </p>
+          </div>
         </div>
 
-        {/* Footer text */}
-        <div className="text-center mt-6">
-          <p className="text-gray-500 text-xs">
-            By signing in, you agree to our Terms of Service and Privacy Policy
-          </p>
+        {/* Right side with image */}
+        <div className="hidden md:flex w-1/2 bg-black items-center justify-center p-6">
+          <img
+            src="/download.png"
+            alt="Login Illustration"
+            className="max-w-full h-auto rounded-lg shadow-lg"
+          />
         </div>
       </div>
     </div>
