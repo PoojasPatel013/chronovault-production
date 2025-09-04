@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://chronovault-production.onrender.com/api/:path*" },
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
