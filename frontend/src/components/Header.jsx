@@ -136,12 +136,12 @@ const Header = () => {
                     Sign In
                     <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 group-hover:w-full transition-all duration-300"></div>
                   </Link>
-                  <Link
+                  {/* <Link
                     to="/register"
                     className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25"
                   >
                     Sign Up
-                  </Link>
+                  </Link> */}
                 </div>
               )}
             </div>
@@ -224,13 +224,13 @@ const Header = () => {
                     >
                       Sign In
                     </Link>
-                    <Link
+                    {/* <Link
                       to="/register"
                       className="block w-full px-6 py-3 text-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl transition-all duration-300 transform hover:scale-105"
                       onClick={() => setIsOpen(false)}
                     >
                       Sign Up
-                    </Link>
+                    </Link> */}
                   </div>
                 )}
               </div>

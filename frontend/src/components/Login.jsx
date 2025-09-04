@@ -1,40 +1,16 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
-import { GoogleLogin } from '@react-oauth/google';
-import { useAuth } from "../contexts/AuthContext"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
+import { useAuth } from "../contexts/AuthContext";
 import api from "./api";
 
 const Login = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { login, loginWithGoogle } = useAuth();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
-
-    try {
-      const user = await login({ email: email.trim().toLowerCase(), password })
-
-      if (user) {
-        const from = location.state?.from?.pathname || "/"
-        navigate(from, { replace: true })
-      } else {
-        setError("Login failed")
-      }
-    } catch (error) {
-      setError(error.message || "Login failed")
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { loginWithGoogle } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black p-4">
@@ -51,7 +27,12 @@ const Login = () => {
           {/* Header */}
           <div className="text-center space-y-2">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mx-auto flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -60,14 +41,19 @@ const Login = () => {
                 />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
-            <p className="text-gray-400">Sign in to your account</p>
+            <h1 className="text-3xl font-bold text-white">Welcome</h1>
+            <p className="text-gray-400">Sign in with your Google account</p>
           </div>
 
           {/* Error message */}
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 flex items-center space-x-3 animate-in slide-in-from-top-2 duration-300">
-              <svg className="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-5 h-5 text-red-400 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -79,143 +65,72 @@ const Login = () => {
             </div>
           )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email field */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-300">Email Address</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                    />
-                  </svg>
-                </div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your email"
-                  required
-                />
+          {/* Google Login button */}
+          <div className="flex justify-center">
+            {loading ? (
+              <div className="flex items-center justify-center space-x-2 text-white">
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 
+                      5.291A7.962 7.962 0 014 12H0c0 3.042 
+                      1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <span>Signing in...</span>
               </div>
-            </div>
+            ) : (
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  setLoading(true);
+                  try {
+                    const res = await api.post(
+                      "/auth/google",
+                      { credential: credentialResponse.credential },
+                      { withCredentials: true }
+                    );
 
-            {/* Password field */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-300">Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                    />
-                  </svg>
-                </div>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your password"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Submit button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full relative py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              {loading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  <span>Signing in...</span>
-                </div>
-              ) : (
-                "Sign In"
-              )}
-            </button>
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                try {
-                  const res = await api.post('/auth/google', {
-                    credential: credentialResponse.credential
-                  });
-
-                  const data = res.data;
-
-                  if (data.success) {
-                    loginWithGoogle(data.user, data.token);
-                    navigate("/", { replace: true });
-                  } else {
-                    setError(data.message || "Google login failed");
+                    if (res.data.success) {
+                      await loginWithGoogle(); // hydrate from /auth/me
+                      navigate("/", { replace: true });
+                    } else {
+                      setError(res.data.message || "Google login failed");
+                    }
+                  } catch (err) {
+                    console.error("Google login error:", err);
+                    setError(err.message || "Google login failed");
+                  } finally {
+                    setLoading(false);
                   }
-                } catch (err) {
-                  console.error("Google login error:", err);
-                  setError(err.message || "Google login failed");
-                }
-              }}
-              onError={() => setError("Google sign-in was unsuccessful")}
-            //onetap
-            />
-          </form>
-
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-transparent text-gray-500">or</span>
-            </div>
-          </div>
-
-          {/* Register link */}
-          <div className="text-center">
-            <button
-              onClick={() => navigate("/register")}
-              className="text-gray-400 hover:text-white transition-colors duration-200 text-sm group"
-            >
-              {"Don't have an account? "}
-              <span className="text-blue-400 hover:text-blue-300 font-medium group-hover:underline">
-                Create one here
-              </span>
-            </button>
+                }}
+                onError={() => setError("Google sign-in was unsuccessful")}
+              />
+            )}
           </div>
         </div>
 
         {/* Footer text */}
         <div className="text-center mt-6">
-          <p className="text-gray-500 text-xs">By signing in, you agree to our Terms of Service and Privacy Policy</p>
+          <p className="text-gray-500 text-xs">
+            By signing in, you agree to our Terms of Service and Privacy Policy
+          </p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
