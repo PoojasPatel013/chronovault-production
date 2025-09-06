@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useAuth } from "../contexts/AuthContext"
 import { AI_CONFIG } from "../config/aiConfig"
+import VoiceWidget from "./VoiceWidget"
 
 const AITherapy = () => {
   const [message, setMessage] = useState("")
@@ -439,6 +440,9 @@ const AITherapy = () => {
                   placeholder="Message AI Therapy..."
                   className="flex-1 bg-transparent text-white placeholder-gray-400 resize-none focus:outline-none min-h-[24px] max-h-[200px]"
                   rows={1}
+                />
+                <VoiceWidget
+                  onResult={(transcript) => setMessage((prev) => prev + (prev ? " " : "") + transcript)}
                 />
                 <button
                   type="submit"
