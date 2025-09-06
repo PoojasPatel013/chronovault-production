@@ -16,7 +16,7 @@ import {
   FaCheck,
 } from "react-icons/fa"
 import api from "./api"
-import VoiceWidget from "./VoiceWidget"
+import AutoFormatEditor from "./AutoFormatEditor"
 
 const TimeCapsule = () => {
   const [title, setTitle] = useState("")
@@ -192,18 +192,11 @@ const TimeCapsule = () => {
                   <span>Memory</span>
                 </label>
                 <div className="relative">
-                  <textarea
-                    rows={6}
-                    value={memory}
-                    onChange={(e) => setMemory(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                    placeholder="Write your memory here... What moment do you want to preserve?"
+                  <AutoFormatEditor
+                    initialContent={memory}
+                    onChange={(html) => setMemory(html)}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   />
-                  <div className="absolute top-2 right-2">
-                    <VoiceWidget
-                      onResult={(transcript) => setMemory((prev) => prev + (prev ? " " : "") + transcript)}
-                    />
-                  </div>
                 </div>
               </div>
 
