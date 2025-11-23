@@ -23,7 +23,7 @@ router.post("/ai-session", verifyToken, async (req, res) => {
     if (!user) return res.status(404).json({ error: "User not found" });
 
     const result = await genAI.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.5-flash",
       contents: [{ role: "user", parts: [{ text: `You are a compassionate therapist. The user is ${user.name}. They said: ${message}` }] }],
       generationConfig: {
         temperature,
@@ -51,7 +51,7 @@ router.post("/ai-session", verifyToken, async (req, res) => {
     res.json({
       message: responseText,
       debug: {
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         responseLength: responseText.length,
         responsePreview: responseText.slice(0, 60) + (responseText.length > 60 ? "..." : ""),
         timestamp: new Date().toISOString()
