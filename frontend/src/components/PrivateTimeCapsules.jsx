@@ -146,7 +146,9 @@ const PrivateTimeCapsules = () => {
 
                     {isUnlocked ? (
                       <div className="space-y-4">
-                        <p className="text-gray-300 leading-relaxed">{capsule.content}</p>
+                        <p className="text-gray-300 leading-relaxed">
+                          {capsule.content}
+                        </p>
                         {capsule.mediaUrl && (
                           <div className="mt-4">
                             {capsule.mediaType?.startsWith("image/") ? (
